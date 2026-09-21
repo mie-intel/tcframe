@@ -1,0 +1,16 @@
+[project]
+name = "tcframe"
+version = "0.1.0"
+description = "Python abstraction layer for the tcframe test case generation framework"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+tcframe = "tcframe.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tcframe"]
