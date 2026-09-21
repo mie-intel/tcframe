@@ -7,7 +7,6 @@
 #include "tcframe/spec/variable.hpp"
 #include "tcframe/util.hpp"
 
-using std::endl;
 using std::istream;
 using std::ostream;
 using std::runtime_error;
@@ -66,7 +65,7 @@ public:
             }
             first = false;
         }
-        *out << endl;
+        *out << '\n';
     }
 
 private:

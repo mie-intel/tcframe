@@ -9,7 +9,6 @@
 #include "Variable.hpp"
 #include "WhitespaceManipulator.hpp"
 
-using std::endl;
 using std::iostream;
 using std::is_same;
 using std::ostream;
@@ -65,7 +64,7 @@ public:
     void printTo(ostream* out) {
         for (int row = 0; row < var_->size(); row++) {
             printRowTo(row, out);
-            *out << endl;
+            *out << '\n';
         }
     }
 
