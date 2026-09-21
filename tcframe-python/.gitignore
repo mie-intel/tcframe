@@ -1,0 +1,11 @@
+# Generated test cases — never commit these
+**/tc/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
