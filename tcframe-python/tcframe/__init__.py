@@ -8,7 +8,7 @@ Exports everything a spec.py needs.
 
 from tcframe.spec.random import rnd
 from tcframe.spec.io_format import LINE, LINES, GRID, EMPTY_LINE, SIZE
-from tcframe.spec.constraint import CONS
+from tcframe.spec.constraint import CONS, Points
 from tcframe.spec.testcase import CASE, SUBTASKS
 from tcframe.spec.config import TimeLimit, MemoryLimit
 from tcframe.spec.base_problem import BaseProblemSpec
@@ -20,7 +20,7 @@ __all__ = [
     'LINE', 'LINES', 'GRID', 'EMPTY_LINE', 'SIZE',
     'CONS',
     'CASE', 'SUBTASKS',
-    'TimeLimit', 'MemoryLimit',
+    'TimeLimit', 'MemoryLimit', 'Points',
     'BaseProblemSpec',
     'BaseTestSpec',
     'tcframe',

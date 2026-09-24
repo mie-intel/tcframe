@@ -46,6 +46,11 @@ def _set_context(suite: Optional[TestSuite], spec: Optional[object]) -> None:
     _ctx.suite = suite
     _ctx.spec = spec
     _ctx.subtask_ids = []
+    _ctx.current_sample = None
+
+
+def _set_current_sample(tc: Optional[TestCase]) -> None:
+    _ctx.current_sample = tc
 
 
 def _get_context():
@@ -57,8 +62,12 @@ def _get_context():
 # ---------------------------------------------------------------------------
 
 def SUBTASKS(*ids: int) -> None:
-    """Assign subsequent CASE() calls in this TestGroup to given subtask IDs."""
-    _ctx.subtask_ids = list(ids)
+    """Assign subtask IDs to the current sample test case or TestGroup's CASE() calls."""
+    current_sample = getattr(_ctx, 'current_sample', None)
+    if current_sample is not None:
+        current_sample.subtask_ids = list(ids)
+    else:
+        _ctx.subtask_ids = list(ids)
 
 
 def CASE(**kwargs) -> None:

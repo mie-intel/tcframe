@@ -372,3 +372,129 @@ def test_run_solution_returns_tuple(tmp_path):
     ret, reason = run_solution('cat', str(in_f), str(out_f))
     assert ret == 0
     assert reason == ''
+
+
+# ---------------------------------------------------------------------------
+# Points DSL
+# ---------------------------------------------------------------------------
+
+def test_subtask_points():
+    class Spec(BaseProblemSpec):
+        N: int
+        def InputFormat(self): LINE(self.N)
+        def Constraints(self): pass
+        def Subtask1(self):
+            Points(70)
+            CONS(lambda: self.N <= 100)
+        def Subtask2(self):
+            Points(30)
+            CONS(lambda: self.N <= 10**9)
+
+    spec = Spec()
+    suite, _ = spec._build_constraint_suite()
+    pts = suite.subtask_points()
+    assert pts[1] == 70
+    assert pts[2] == 30
+
+
+# ---------------------------------------------------------------------------
+# SUBTASKS in sample test cases
+# ---------------------------------------------------------------------------
+
+def test_subtasks_in_sample():
+    spec = _make_spec()
+
+    class TestSpec(BaseTestSpec):
+        def SampleTestCase1(self):
+            SUBTASKS(1, 2)
+            self.Input(["1 1"])
+            self.Output(["2"])
+
+        def TestCases(self):
+            CASE(A=1, B=1)
+
+    ts = TestSpec()
+    suite = ts._build_test_suite('prob', spec)
+    sample = suite.test_cases[0]
+    assert sample.is_sample
+    assert sample.subtask_ids == [1, 2]
+
+
+# ---------------------------------------------------------------------------
+# CLI args parsing
+# ---------------------------------------------------------------------------
+
+def test_args_defaults():
+    from tcframe.runner.args import parse_args
+    args = parse_args([])
+    assert args.command == 'generate'
+    assert args.solution == './solution'
+    assert args.output_dir == 'tc'
+    assert args.seed == 0
+    assert args.time_limit is None
+    assert args.memory_limit is None
+    assert not args.no_time_limit
+    assert not args.no_memory_limit
+    assert not args.brief
+
+
+def test_args_grade_subcommand():
+    from tcframe.runner.args import parse_args
+    args = parse_args(['grade', '--solution', './my_sol', '--output', 'out', '--brief'])
+    assert args.command == 'grade'
+    assert args.solution == './my_sol'
+    assert args.output_dir == 'out'
+    assert args.brief
+
+
+def test_args_limits_override():
+    from tcframe.runner.args import parse_args
+    args = parse_args(['--time-limit', '5', '--no-memory-limit'])
+    assert args.time_limit == 5
+    assert args.no_memory_limit is True
+
+
+# ---------------------------------------------------------------------------
+# Verdict system
+# ---------------------------------------------------------------------------
+
+def test_verdict_ordering():
+    from tcframe.runner.verdict import Verdict
+    assert Verdict.ac() < Verdict.wa()
+    assert Verdict.wa() < Verdict.rte()
+    assert Verdict.rte() < Verdict.tle()
+
+
+def test_grader_diff(tmp_path):
+    from tcframe.runner.grader import _diff
+    a = tmp_path / 'a.txt'
+    b = tmp_path / 'b.txt'
+    a.write_text('10\n')
+    b.write_text('10\n')
+    assert _diff(str(a), str(b))
+    b.write_text('11\n')
+    assert not _diff(str(a), str(b))
+
+
+def test_grader_ac(tmp_path):
+    from tcframe.runner.grader import Grader, GradingOptions
+    from tcframe.spec.testcase import TestSuite, TestCase
+
+    # Build a minimal suite with one official test case
+    suite = TestSuite()
+    tc = TestCase(name='prob_1', is_sample=False)
+    suite.add(tc)
+
+    in_f = tmp_path / 'prob_1.in'
+    expected_f = tmp_path / 'prob_1.out'
+    in_f.write_text('3\n')
+    expected_f.write_text('3\n')   # cat echoes input → AC
+
+    grader = Grader(suite)
+    options = GradingOptions(
+        slug='prob',
+        output_dir=str(tmp_path),
+        solution_command='cat',
+    )
+    # Should not raise; just prints
+    grader.grade(options)

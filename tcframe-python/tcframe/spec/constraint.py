@@ -22,6 +22,7 @@ class ConstraintSuite:
     def __init__(self):
         # 0 = global (Constraints()), 1..25 = subtask N (SubtaskN())
         self._groups: Dict[int, List[Constraint]] = {0: []}
+        self._subtask_points: Dict[int, float] = {}
 
     def add(self, c: Constraint) -> None:
         subtask_id = getattr(_ctx, 'current_subtask_id', 0)
@@ -29,11 +30,17 @@ class ConstraintSuite:
             self._groups[subtask_id] = []
         self._groups[subtask_id].append(c)
 
+    def set_points(self, subtask_id: int, points: float) -> None:
+        self._subtask_points[subtask_id] = points
+
     def global_constraints(self) -> List[Constraint]:
         return self._groups.get(0, [])
 
     def subtask_constraints(self, subtask_id: int) -> List[Constraint]:
         return self._groups.get(subtask_id, [])
+
+    def subtask_points(self) -> Dict[int, float]:
+        return dict(self._subtask_points)
 
     def has_subtasks(self) -> bool:
         return any(k != 0 for k in self._groups)
@@ -105,3 +112,13 @@ def CONS(predicate: Callable[[], bool]) -> None:
     if suite is None:
         raise RuntimeError("CONS() must be called inside Constraints() or SubtaskN()")
     suite.add(Constraint(predicate, _extract_desc(predicate)))
+
+
+def Points(p: float) -> None:
+    sid = getattr(_ctx, 'current_subtask_id', 0)
+    if sid == 0:
+        raise RuntimeError("Points() must be called inside SubtaskN()")
+    suite = _get_suite()
+    if suite is None:
+        raise RuntimeError("Points() must be called inside SubtaskN()")
+    suite.set_points(sid, p)

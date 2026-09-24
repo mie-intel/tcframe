@@ -1,14 +1,13 @@
 """
 A+B Problem — tcframe-python end-to-end example.
 
-Run:
+Generate:
     cd examples/aplusb
-    python3 spec.py
+    python3 spec.py [--solution ./solution] [--output tc] [--seed 0]
+                    [--no-time-limit] [--no-memory-limit]
 
-Or with a custom solution path:
-    python3 spec.py  (defaults to ./solution)
-
-Generates test cases in tc/ directory.
+Grade existing test cases:
+    python3 spec.py grade [--solution ./solution]
 """
 
 import sys

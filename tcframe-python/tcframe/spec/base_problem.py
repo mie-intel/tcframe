@@ -84,7 +84,7 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
         _set_builder(None)
         return IOManipulator(builder.build())
 
-    def _build_constraint_suite(self) -> tuple[ConstraintSuite, Verifier]:
+    def _build_constraint_suite(self) -> 'tuple[ConstraintSuite, Verifier]':
         suite = ConstraintSuite()
 
         # Global constraints
