@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 from tcframe.runner.verdict import Verdict, TestCaseVerdict, SubtaskVerdict, _fmt
-from tcframe.runner.os_utils import run_solution, run_scorer, run_interactive
+from tcframe.runner.os_utils import check_command, run_solution, run_scorer, run_interactive
 from tcframe.runner import colors
 
 if TYPE_CHECKING:
@@ -45,6 +45,19 @@ class Grader:
         if options.memory_limit is not None:
             print(f"  memory limit : {options.memory_limit} MB")
         print()
+
+        checks = [(options.solution_command, 'solution')]
+        if options.scorer_command:
+            checks.append((options.scorer_command, 'scorer'))
+        if options.communicator_command:
+            checks.append((options.communicator_command, 'communicator'))
+        for command, what in checks:
+            err = check_command(command, what)
+            if err:
+                print(f"{colors.red('Error:')} {err}")
+                print()
+                print(colors.red('Aborted: nothing graded.'))
+                return
 
         out_dir = Path(options.output_dir)
         has_subtasks = any(tc.subtask_ids for tc in self._suite.test_cases if not tc.is_sample)

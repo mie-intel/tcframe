@@ -4,7 +4,7 @@ from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from tcframe.runner.os_utils import run_solution
+from tcframe.runner.os_utils import check_command, run_solution
 from tcframe.runner import colors
 
 if TYPE_CHECKING:
@@ -49,6 +49,15 @@ class Generator:
             print(f"  time limit   : {options.time_limit}s")
         if options.memory_limit is not None:
             print(f"  memory limit : {options.memory_limit} MB")
+
+        if options.has_output:
+            err = check_command(options.solution_command, 'solution')
+            if err:
+                print()
+                print(f"{colors.red('Error:')} {err}")
+                print()
+                print(colors.red('Aborted: no test cases generated.'))
+                return
 
         multi = options.multi_tc_config
         if multi and multi.counter_var:
@@ -139,7 +148,7 @@ class Generator:
                     ok += 1
                 continue
 
-            ret, reason, _ = run_solution(
+            ret, reason, stderr = run_solution(
                 options.solution_command,
                 str(in_path),
                 str(out_path),
@@ -150,6 +159,7 @@ class Generator:
                 for tc in tcs:
                     print(f"  {tc.name}: {colors.failed()} ({reason})")
                     fail += 1
+                _print_stderr(stderr)
             else:
                 for tc in tcs:
                     print(f"  {tc.name}: {colors.ok()}")
@@ -186,7 +196,7 @@ class Generator:
         if not options.has_output:
             return True, ''
 
-        ret, reason, _ = run_solution(
+        ret, reason, stderr = run_solution(
             options.solution_command,
             str(in_path),
             str(out_path),
@@ -195,6 +205,7 @@ class Generator:
         )
         if ret != 0:
             print(f"  {tc.name}: {colors.failed()} ({reason})")
+            _print_stderr(stderr)
             return False, reason
 
         # Output format verification
@@ -205,3 +216,13 @@ class Generator:
                 return False, fmt_err
 
         return True, ''
+
+
+def _print_stderr(stderr: str, max_lines: int = 5) -> None:
+    if not stderr:
+        return
+    lines = stderr.splitlines()
+    for line in lines[:max_lines]:
+        print(f"    | {line}")
+    if len(lines) > max_lines:
+        print(f"    | ... ({len(lines) - max_lines} more line(s))")

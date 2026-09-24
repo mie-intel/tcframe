@@ -121,3 +121,16 @@ Generated test cases land in a `tc/` folder next to the spec.
 ## Full design
 
 See [`DESIGN.md`](DESIGN.md) at the repo root for the full architecture and design decisions.
+
+## Future Works
+
+- **Interactive problems on Windows.** Grading with a communicator (`InteractiveEvaluator()`) currently works only on Linux and macOS, because the solution and communicator talk over file descriptors 3 and 4, which Windows does not support. The plan is to switch to the protocol documented for C++ tcframe: the communicator gets the input file as `argv[1]`, talks to the solution over its stdin/stdout, and writes the verdict (`AC` / `WA`) to stderr. That uses plain pipes, which work on every OS, and makes communicators written for C++ tcframe usable as-is. It will also fix the verdict: today a communicator that reports `WA` is still graded as AC.
+- **Tested.** Currently this project still not have been tested yet.
+
+## Changelog
+
+| Version | Changes |
+| --- | --- |
+| 0.1.2 | Solutions and scorers run the same way on Windows, Linux and macOS (`./solution` also finds `solution.exe` on Windows). A missing, non-executable or wrong-OS solution now stops with a clear error and a compile hint instead of failing every test case with exit code 127. Failed test cases show the solution's stderr. Crashes without a memory limit are reported by signal name (e.g. `SIGSEGV`) instead of "memory limit exceeded". |
+| 0.1.1 | Add README on the package. |
+| 0.1.0 | Initial version. |

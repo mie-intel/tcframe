@@ -1,6 +1,6 @@
 [project]
 name = "tcframe"
-version = "0.1.0"
+version = "0.1.2"
 description = "Python abstraction layer for the tcframe test case generation framework"
 readme = "README.md"
 requires-python = ">=3.10"
