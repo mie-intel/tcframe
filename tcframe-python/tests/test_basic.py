@@ -264,3 +264,111 @@ def test_rnd_big_int():
     rnd.setSeed(0)
     v = rnd.nextInt(0, 10 ** 100)
     assert 0 <= v <= 10 ** 100
+
+
+# ---------------------------------------------------------------------------
+# GradingConfig
+# ---------------------------------------------------------------------------
+
+def test_grading_config_defaults():
+    from tcframe.spec.config import GradingConfig, DEFAULT_TIME_LIMIT, DEFAULT_MEMORY_LIMIT
+
+    class Spec(BaseProblemSpec):
+        N: int
+        def InputFormat(self): LINE(self.N)
+        def Constraints(self): pass
+
+    spec = Spec()
+    cfg = spec._build_grading_config()
+    assert cfg.time_limit == DEFAULT_TIME_LIMIT
+    assert cfg.memory_limit == DEFAULT_MEMORY_LIMIT
+
+
+def test_grading_config_custom():
+    class Spec(BaseProblemSpec):
+        N: int
+        def InputFormat(self): LINE(self.N)
+        def Constraints(self): pass
+        def GradingConfig(self):
+            TimeLimit(5)
+            MemoryLimit(256)
+
+    spec = Spec()
+    cfg = spec._build_grading_config()
+    assert cfg.time_limit == 5
+    assert cfg.memory_limit == 256
+
+
+# ---------------------------------------------------------------------------
+# Subtasks
+# ---------------------------------------------------------------------------
+
+def test_subtask_constraints_pass():
+    class Spec(BaseProblemSpec):
+        N: int
+        def InputFormat(self): LINE(self.N)
+        def Constraints(self):
+            CONS(lambda: self.N >= 1)
+        def Subtask1(self):
+            CONS(lambda: self.N <= 100)
+        def Subtask2(self):
+            CONS(lambda: self.N <= 10**9)
+
+    spec = Spec()
+    spec.N = 50
+    _, verifier = spec._build_constraint_suite()
+
+    # subtask 1: N in [1,100] — 50 passes
+    assert verifier.verify([1]) == []
+    # subtask 2: N in [1,1e9] — 50 passes
+    assert verifier.verify([2]) == []
+
+
+def test_subtask_constraints_fail():
+    class Spec(BaseProblemSpec):
+        N: int
+        def InputFormat(self): LINE(self.N)
+        def Constraints(self):
+            CONS(lambda: self.N >= 1)
+        def Subtask1(self):
+            CONS(lambda: self.N <= 100)
+
+    spec = Spec()
+    spec.N = 500  # fails subtask 1 constraint
+    _, verifier = spec._build_constraint_suite()
+
+    assert verifier.verify([1]) != []
+    assert verifier.verify([2]) == []  # subtask 2 has no constraints
+
+
+def test_subtasks_dsl_on_test_case():
+    spec = _make_spec()
+
+    class TestSpec(BaseTestSpec):
+        def TestGroup1(self):
+            SUBTASKS(1, 2)
+            CASE(A=1, B=1)
+
+        def TestGroup2(self):
+            SUBTASKS(2)
+            CASE(A=500, B=500)
+
+    ts = TestSpec()
+    suite = ts._build_test_suite('prob', spec)
+    cases = suite.test_cases
+    assert cases[0].subtask_ids == [1, 2]
+    assert cases[1].subtask_ids == [2]
+
+
+# ---------------------------------------------------------------------------
+# os_utils return signature
+# ---------------------------------------------------------------------------
+
+def test_run_solution_returns_tuple(tmp_path):
+    from tcframe.runner.os_utils import run_solution
+    in_f = tmp_path / 'in.txt'
+    out_f = tmp_path / 'out.txt'
+    in_f.write_text('1 2\n')
+    ret, reason = run_solution('cat', str(in_f), str(out_f))
+    assert ret == 0
+    assert reason == ''

@@ -12,12 +12,14 @@ class TestCase:
         apply_fn: Optional[Callable[[], None]] = None,
         sample_input: Optional[str] = None,
         sample_output: Optional[str] = None,
+        subtask_ids: Optional[List[int]] = None,
     ):
         self.name = name
         self.is_sample = is_sample
         self._apply_fn = apply_fn
         self.sample_input = sample_input
         self.sample_output = sample_output
+        self.subtask_ids: List[int] = subtask_ids or []
 
     def apply(self) -> None:
         if self._apply_fn:
@@ -43,6 +45,7 @@ class TestSuite:
 def _set_context(suite: Optional[TestSuite], spec: Optional[object]) -> None:
     _ctx.suite = suite
     _ctx.spec = spec
+    _ctx.subtask_ids = []
 
 
 def _get_context():
@@ -53,16 +56,22 @@ def _get_context():
 # Public DSL
 # ---------------------------------------------------------------------------
 
+def SUBTASKS(*ids: int) -> None:
+    """Assign subsequent CASE() calls in this TestGroup to given subtask IDs."""
+    _ctx.subtask_ids = list(ids)
+
+
 def CASE(**kwargs) -> None:
     suite, spec = _get_context()
     if suite is None:
         raise RuntimeError("CASE() must be called inside TestCases() or TestGroupN()")
 
-    _spec = spec  # capture for closure
+    _spec = spec
+    subtask_ids = list(getattr(_ctx, 'subtask_ids', []))
 
     def apply():
         for name, value in kwargs.items():
             object.__setattr__(_spec, name, value)
 
-    tc = TestCase(name="", is_sample=False, apply_fn=apply)
+    tc = TestCase(name="", is_sample=False, apply_fn=apply, subtask_ids=subtask_ids)
     suite.add(tc)

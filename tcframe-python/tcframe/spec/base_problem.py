@@ -18,7 +18,8 @@ from tcframe.spec.io_format import (
     IOFormatBuilder, IOManipulator, VarRef,
     _set_builder, _get_builder,
 )
-from tcframe.spec.constraint import ConstraintSuite, Verifier, _set_suite
+from tcframe.spec.constraint import ConstraintSuite, Verifier, _set_suite, _set_current_subtask
+from tcframe.spec.config import GradingConfig, _set_config, _get_config
 
 
 class ProblemSpecMeta(type):
@@ -29,7 +30,6 @@ class ProblemSpecMeta(type):
         parent_vars: dict = {}
         for base in bases:
             parent_vars.update(getattr(base, '_tcframe_var_types', {}))
-        # Exclude private/dunder names — only user-declared variables allowed
         own_annotations = {
             k: v for k, v in namespace.get('__annotations__', {}).items()
             if not k.startswith('_')
@@ -39,11 +39,10 @@ class ProblemSpecMeta(type):
 
 
 class BaseProblemSpec(metaclass=ProblemSpecMeta):
-    _tcframe_var_types = {}  # populated by ProblemSpecMeta; no annotation to avoid self-inclusion
+    _tcframe_var_types = {}
 
     def __init__(self):
         object.__setattr__(self, '_recording', False)
-        # Initialise declared variables to None
         for var_name in self.__class__._tcframe_var_types:
             object.__setattr__(self, var_name, None)
 
@@ -52,7 +51,6 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
     # ------------------------------------------------------------------
 
     def __getattribute__(self, name: str) -> Any:
-        # Always bypass override for private / dunder attributes and methods
         if name.startswith('_'):
             return object.__getattribute__(self, name)
 
@@ -88,10 +86,36 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
 
     def _build_constraint_suite(self) -> tuple[ConstraintSuite, Verifier]:
         suite = ConstraintSuite()
+
+        # Global constraints
         _set_suite(suite)
+        _set_current_subtask(0)
         self.Constraints()
+
+        # Per-subtask constraints
+        for i in range(1, 26):
+            method = getattr(type(self), f'Subtask{i}', None)
+            if method is None:
+                break
+            try:
+                _set_current_subtask(i)
+                method(self)
+            except NotImplementedError:
+                break
+
         _set_suite(None)
+        _set_current_subtask(0)
         return suite, Verifier(suite)
+
+    def _build_grading_config(self) -> GradingConfig:
+        cfg = GradingConfig()
+        _set_config(cfg)
+        try:
+            self.GradingConfig()
+        except NotImplementedError:
+            pass
+        _set_config(None)
+        return cfg
 
     # ------------------------------------------------------------------
     # Override points (user implements these)
@@ -104,10 +128,37 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
         raise NotImplementedError
 
     def Constraints(self):
-        pass  # optional
+        pass
 
     def GradingConfig(self):
         pass
 
     def StyleConfig(self):
         pass
+
+    # Subtask1..25 — user implements whichever they need
+    def Subtask1(self): raise NotImplementedError
+    def Subtask2(self): raise NotImplementedError
+    def Subtask3(self): raise NotImplementedError
+    def Subtask4(self): raise NotImplementedError
+    def Subtask5(self): raise NotImplementedError
+    def Subtask6(self): raise NotImplementedError
+    def Subtask7(self): raise NotImplementedError
+    def Subtask8(self): raise NotImplementedError
+    def Subtask9(self): raise NotImplementedError
+    def Subtask10(self): raise NotImplementedError
+    def Subtask11(self): raise NotImplementedError
+    def Subtask12(self): raise NotImplementedError
+    def Subtask13(self): raise NotImplementedError
+    def Subtask14(self): raise NotImplementedError
+    def Subtask15(self): raise NotImplementedError
+    def Subtask16(self): raise NotImplementedError
+    def Subtask17(self): raise NotImplementedError
+    def Subtask18(self): raise NotImplementedError
+    def Subtask19(self): raise NotImplementedError
+    def Subtask20(self): raise NotImplementedError
+    def Subtask21(self): raise NotImplementedError
+    def Subtask22(self): raise NotImplementedError
+    def Subtask23(self): raise NotImplementedError
+    def Subtask24(self): raise NotImplementedError
+    def Subtask25(self): raise NotImplementedError

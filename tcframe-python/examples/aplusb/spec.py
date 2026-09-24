@@ -35,6 +35,10 @@ class ProblemSpec(BaseProblemSpec):
         CONS(lambda: 1 <= self.A <= 10**18)
         CONS(lambda: 1 <= self.B <= 10**18)
 
+    def GradingConfig(self):
+        TimeLimit(2)
+        MemoryLimit(64)
+
 
 class TestSpec(BaseTestSpec):
 
