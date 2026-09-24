@@ -44,7 +44,8 @@ class Verdict:
 class TestCaseVerdict:
     verdict: Verdict
     points: Optional[float] = None
-    extra: Optional[str] = None  # stderr or scorer message shown on failure
+    extra: Optional[str] = None   # stderr or scorer message shown on failure
+    score: float = 1.0            # partial-score multiplier from custom scorer (0.0–1.0)
 
     def to_string(self) -> str:
         if self.points is not None:

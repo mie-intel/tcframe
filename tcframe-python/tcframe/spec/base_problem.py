@@ -88,6 +88,17 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
         except NotImplementedError:
             pass
 
+        # OutputFormat1..5 — alternative valid output formats
+        for i in range(1, 6):
+            method = getattr(type(self), f'OutputFormat{i}', None)
+            if method is None:
+                break
+            try:
+                builder.start_output_variant(i)
+                method(self)
+            except NotImplementedError:
+                break
+
         object.__setattr__(self, '_recording', False)
         _set_builder(None)
         return IOManipulator(builder.build())
@@ -157,6 +168,12 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
 
     def OutputFormat(self):
         raise NotImplementedError
+
+    def OutputFormat1(self): raise NotImplementedError
+    def OutputFormat2(self): raise NotImplementedError
+    def OutputFormat3(self): raise NotImplementedError
+    def OutputFormat4(self): raise NotImplementedError
+    def OutputFormat5(self): raise NotImplementedError
 
     def BeforeOutputFormat(self):
         raise NotImplementedError

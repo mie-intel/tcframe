@@ -1,7 +1,12 @@
 import argparse
 import sys
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 from typing import Optional
+
+
+def _default_seed() -> int:
+    return int(time.time() * 1000) & 0x7FFFFFFF
 
 
 @dataclass
@@ -9,7 +14,7 @@ class Args:
     command: str = 'generate'       # 'generate' or 'grade'
     solution: str = './solution'
     output_dir: str = 'tc'
-    seed: int = 0
+    seed: int = field(default_factory=_default_seed)
     time_limit: Optional[int] = None
     no_time_limit: bool = False
     memory_limit: Optional[int] = None

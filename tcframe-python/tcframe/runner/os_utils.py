@@ -78,12 +78,19 @@ def run_scorer(
     in_path: str,
     expected_path: str,
     actual_path: str,
-) -> tuple[bool, str]:
+) -> tuple[bool, float, str]:
     """
     Run custom scorer: scorer <in> <expected> <actual>.
-    Scorer exit 0 = AC, non-0 = WA.
-    Returns (is_ac, scorer_message).
-    scorer_message is the scorer's stdout/stderr output.
+
+    Scorer stdout protocol (first line):
+      AC           → accepted, full score (1.0)
+      AC 0.7       → accepted, partial score 0.7 (0.0–1.0)
+      WA           → wrong answer, score 0.0
+      WA <msg>     → wrong answer with message
+      (exit 0)     → AC if no verdict line; (exit non-0) → WA
+
+    Returns (is_ac, score_fraction, message).
+    score_fraction is in [0.0, 1.0]; 1.0 for full AC, 0.0 for WA.
     """
     try:
         result = subprocess.run(
@@ -93,12 +100,36 @@ def run_scorer(
             shell=True,
             timeout=30,
         )
-        msg = (result.stdout + result.stderr).decode(errors='replace').strip()
-        return result.returncode == 0, msg
+        raw = (result.stdout + result.stderr).decode(errors='replace').strip()
+        lines = raw.splitlines()
+        first = lines[0].strip() if lines else ''
+        rest = '\n'.join(lines[1:]).strip() if len(lines) > 1 else ''
+        message = rest or first
+
+        parts = first.split()
+        verdict_code = parts[0].upper() if parts else ''
+
+        score = 1.0
+        if len(parts) >= 2:
+            try:
+                score = max(0.0, min(1.0, float(parts[1])))
+            except ValueError:
+                pass
+
+        # Determine AC/WA
+        if verdict_code == 'AC':
+            return True, score, rest
+        if verdict_code == 'WA':
+            return False, 0.0, message
+        # No explicit verdict: use exit code
+        if result.returncode == 0:
+            return True, 1.0, message
+        return False, 0.0, message
+
     except subprocess.TimeoutExpired:
-        return False, 'scorer timed out'
+        return False, 0.0, 'scorer timed out'
     except Exception as exc:
-        return False, str(exc)
+        return False, 0.0, str(exc)
 
 
 def run_interactive(

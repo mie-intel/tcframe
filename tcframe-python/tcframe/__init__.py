@@ -7,7 +7,7 @@ Exports everything a spec.py needs.
 """
 
 from tcframe.spec.random import rnd
-from tcframe.spec.io_format import LINE, LINES, GRID, EMPTY_LINE, SIZE
+from tcframe.spec.io_format import LINE, LINES, GRID, EMPTY_LINE, RAW_LINE, RAW_LINES, SIZE
 from tcframe.spec.constraint import CONS, Points
 from tcframe.spec.testcase import CASE, SUBTASKS
 from tcframe.spec.config import (
@@ -24,7 +24,7 @@ __all__ = [
     # RNG
     'rnd',
     # IO format DSL
-    'LINE', 'LINES', 'GRID', 'EMPTY_LINE', 'SIZE',
+    'LINE', 'LINES', 'GRID', 'EMPTY_LINE', 'RAW_LINE', 'RAW_LINES', 'SIZE',
     # Constraint DSL
     'CONS', 'Points',
     # Test case DSL
