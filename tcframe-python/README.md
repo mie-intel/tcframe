@@ -98,6 +98,26 @@ tcframe.run(
 )
 ```
 
+## Examples
+
+Working examples are in [`examples/`](examples/):
+
+| Folder | What it shows |
+| --- | --- |
+| [`aplusb/`](examples/aplusb/) | Basic usage — A+B problem with constraints and random test cases |
+| [`aplusb_multi/`](examples/aplusb_multi/) | Multiple test cases per file (`MultipleTestCasesConfig`) |
+| [`distinct/`](examples/distinct/) | Subtasks + grading with TLE/MLE verdict detection |
+
+Each folder has a `spec.py` (the generator spec) and one or more `solution_*.cpp` files. To run an example:
+
+```bash
+cd examples/aplusb
+make          # compiles the solution
+python spec.py
+```
+
+Generated test cases land in a `tc/` folder next to the spec.
+
 ## Full design
 
 See [`DESIGN.md`](DESIGN.md) at the repo root for the full architecture and design decisions.

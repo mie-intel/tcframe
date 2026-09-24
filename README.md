@@ -3,8 +3,8 @@
 
   <h1>TCFrame</h1>
 
-  A test case generation framework for competitive programming problems.
- 
+A test case generation framework for competitive programming problems.
+
   <img alt="CI" src="https://github.com/ia-toki/tcframe/workflows/ci/badge.svg"/>
   <a href="https://github.com/ia-toki/tcframe/blob/master/LICENSE.txt"><img alt="License" src="https://img.shields.io/github/license/ia-toki/tcframe.svg"/></a>
 </div>
@@ -15,99 +15,101 @@ TCFrame is a C++ framework for generating test cases of competitive programming 
 
 Consult the complete documentation at https://tcframe.toki.id.
 
+> **New:** A Python abstraction layer for tcframe is now available (initial version) — see [`tcframe-python/`](tcframe-python/).
+
 Example high-level usage:
 
 1. Specify input/output variables.
 
-    ```cpp
-    int A, B;
-    int sum;
-    ```
+   ```cpp
+   int A, B;
+   int sum;
+   ```
 
 1. Specify input/output formats, using a rich set of format macros.
 
-    ```cpp
-    void InputFormat() {
-        LINE(A, B); // A line containing space-separated A and B
-    }
-    void OutputFormat() {
-        LINE(sum);
-    }
-    ```
+   ```cpp
+   void InputFormat() {
+       LINE(A, B); // A line containing space-separated A and B
+   }
+   void OutputFormat() {
+       LINE(sum);
+   }
+   ```
 
 1. Specify the grading configuration.
 
-    ```cpp
-    void GradingConfig() {
-        TimeLimit(1);
-        MemoryLimit(64);
-    }
-    ```
+   ```cpp
+   void GradingConfig() {
+       TimeLimit(1);
+       MemoryLimit(64);
+   }
+   ```
 
 1. Specify the constraints. Subtasks are supported.
 
-    ```cpp
-    void Constraints() {
-        CONS(1 <= A && A <= 1000);
-        CONS(1 <= B && B <= 1000);
-    }
-    ```
+   ```cpp
+   void Constraints() {
+       CONS(1 <= A && A <= 1000);
+       CONS(1 <= B && B <= 1000);
+   }
+   ```
 
 1. Specify the sample test cases.
 
-    ```cpp
-    void SampleTestCase1() {
-        Input({
-            "2 8"
-        });
-        Output({
-            "10"
-        });
-    }
-    void SampleTestCase2() {
-        Input({
-            "42 100"
-        });
-        Output({
-            "142"
-        });
-    }
-    ```
+   ```cpp
+   void SampleTestCase1() {
+       Input({
+           "2 8"
+       });
+       Output({
+           "10"
+       });
+   }
+   void SampleTestCase2() {
+       Input({
+           "42 100"
+       });
+       Output({
+           "142"
+       });
+   }
+   ```
 
 1. Specify the official test cases. Simple random number generator is available.
 
-    ```cpp
-    void TestCases() {
-        CASE(A = 1, B = 1);
-        CASE(A = 77, B = 99);
-        CASE(A = rnd.nextInt(1, 1000), B = rnd.nextInt(1, 1000));
-    }
-    ```
+   ```cpp
+   void TestCases() {
+       CASE(A = 1, B = 1);
+       CASE(A = 77, B = 99);
+       CASE(A = rnd.nextInt(1, 1000), B = rnd.nextInt(1, 1000));
+   }
+   ```
 
 1. Write and compile the official solution to this problem, using any programming language you wish. Of course, it is the infamous A+B problem.
 
-    ```cpp
-    #include <iostream>
-    using namespace std;
+   ```cpp
+   #include <iostream>
+   using namespace std;
 
-    int main() {
-        int A, B;
-        cin >> A >> B;
-        cout << (A + B) << endl;
-    }
-    ```
+   int main() {
+       int A, B;
+       cin >> A >> B;
+       cout << (A + B) << endl;
+   }
+   ```
 
 1. Run the generator. Actual test cases (`.in` and `.out` files) will be generated. Profit!
 
 1. If you ever specified an invalid test case, such as `CASE(A = 0, B = 1)`, you will get a nice error message:
 
-	```
-      sum_4: FAILED
-        Description: A = 0, B = 1
-        Reasons:
-        * Does not satisfy constraints, on:
-          - 1 <= A && A <= 1000
-	```
+   ```
+     sum_4: FAILED
+       Description: A = 0, B = 1
+       Reasons:
+       * Does not satisfy constraints, on:
+         - 1 <= A && A <= 1000
+   ```
 
 ## Features
 
