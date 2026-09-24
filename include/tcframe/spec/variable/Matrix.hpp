@@ -9,6 +9,7 @@
 #include "Variable.hpp"
 #include "WhitespaceManipulator.hpp"
 
+using std::endl;
 using std::iostream;
 using std::is_same;
 using std::ostream;
