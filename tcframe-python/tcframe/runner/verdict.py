@@ -32,6 +32,10 @@ class Verdict:
         return cls('TLE', 'Time Limit Exceeded', 4)
 
     @classmethod
+    def mle(cls) -> 'Verdict':
+        return cls('MLE', 'Memory Limit Exceeded', 5)
+
+    @classmethod
     def err(cls) -> 'Verdict':
         return cls('ERR', 'Internal Error', 99)
 

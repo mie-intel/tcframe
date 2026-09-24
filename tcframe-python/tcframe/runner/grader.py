@@ -78,6 +78,8 @@ class Grader:
         if ret != 0:
             if 'time limit' in reason:
                 return TestCaseVerdict(Verdict.tle())
+            if 'memory limit' in reason:
+                return TestCaseVerdict(Verdict.mle())
             return TestCaseVerdict(Verdict.rte())
 
         if not expected_path.exists():
