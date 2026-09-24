@@ -10,6 +10,7 @@ examples/*/solution_wa
 
 # Python artifacts
 __pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.egg-info/
