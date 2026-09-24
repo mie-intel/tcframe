@@ -1,16 +1,16 @@
-CC      = gcc
-CFLAGS  = -O2 -Wall -o
+CXX     = g++
+CXXFLAGS = -std=c++17 -O2
 
 all: solution_ac solution_tle solution_mle
 
-solution_ac:  solution_ac.c
-	$(CC) $(CFLAGS) $@ $<
+solution_ac:  solution_ac.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
-solution_tle: solution_tle.c
-	$(CC) $(CFLAGS) $@ $<
+solution_tle: solution_tle.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
-solution_mle: solution_mle.c
-	$(CC) $(CFLAGS) $@ $<
+solution_mle: solution_mle.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
 	rm -f solution_ac solution_tle solution_mle
