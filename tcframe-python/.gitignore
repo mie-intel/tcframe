@@ -6,6 +6,7 @@ examples/*/solution
 examples/*/solution_ac
 examples/*/solution_tle
 examples/*/solution_mle
+examples/*/solution_wa
 
 # Python artifacts
 __pycache__/

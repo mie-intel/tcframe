@@ -13,6 +13,7 @@ class TestCase:
         sample_input: Optional[str] = None,
         sample_output: Optional[str] = None,
         subtask_ids: Optional[List[int]] = None,
+        group_number: int = 0,
     ):
         self.name = name
         self.is_sample = is_sample
@@ -20,6 +21,7 @@ class TestCase:
         self.sample_input = sample_input
         self.sample_output = sample_output
         self.subtask_ids: List[int] = subtask_ids or []
+        self.group_number: int = group_number  # 0 = TestCases(), N = TestGroupN()
 
     def apply(self) -> None:
         if self._apply_fn:
@@ -47,6 +49,11 @@ def _set_context(suite: Optional[TestSuite], spec: Optional[object]) -> None:
     _ctx.spec = spec
     _ctx.subtask_ids = []
     _ctx.current_sample = None
+    _ctx.current_group = 0
+
+
+def _set_current_group(group_number: int) -> None:
+    _ctx.current_group = group_number
 
 
 def _set_current_sample(tc: Optional[TestCase]) -> None:
@@ -77,10 +84,12 @@ def CASE(**kwargs) -> None:
 
     _spec = spec
     subtask_ids = list(getattr(_ctx, 'subtask_ids', []))
+    group_number = getattr(_ctx, 'current_group', 0)
 
     def apply():
         for name, value in kwargs.items():
             object.__setattr__(_spec, name, value)
 
-    tc = TestCase(name="", is_sample=False, apply_fn=apply, subtask_ids=subtask_ids)
+    tc = TestCase(name="", is_sample=False, apply_fn=apply, subtask_ids=subtask_ids,
+                  group_number=group_number)
     suite.add(tc)

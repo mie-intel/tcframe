@@ -19,7 +19,11 @@ from tcframe.spec.io_format import (
     _set_builder, _get_builder,
 )
 from tcframe.spec.constraint import ConstraintSuite, Verifier, _set_suite, _set_current_subtask
-from tcframe.spec.config import GradingConfig, _set_config, _get_config
+from tcframe.spec.config import (
+    GradingConfig, _set_grading_config, _get_grading_config,
+    StyleConfig, _set_style_config,
+    MultipleTestCasesConfig, _set_multi_config,
+)
 
 
 class ProblemSpecMeta(type):
@@ -76,6 +80,10 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
 
         builder.start_output()
         try:
+            self.BeforeOutputFormat()
+        except NotImplementedError:
+            pass
+        try:
             self.OutputFormat()
         except NotImplementedError:
             pass
@@ -109,12 +117,35 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
 
     def _build_grading_config(self) -> GradingConfig:
         cfg = GradingConfig()
-        _set_config(cfg)
+        _set_grading_config(cfg)
         try:
             self.GradingConfig()
         except NotImplementedError:
             pass
-        _set_config(None)
+        _set_grading_config(None)
+        return cfg
+
+    def _build_style_config(self) -> StyleConfig:
+        cfg = StyleConfig()
+        _set_style_config(cfg)
+        try:
+            self.StyleConfig()
+        except NotImplementedError:
+            pass
+        _set_style_config(None)
+        return cfg
+
+    def _build_multiple_test_cases_config(self) -> MultipleTestCasesConfig:
+        cfg = MultipleTestCasesConfig()
+        _set_multi_config(cfg)
+        # Enable recording so Counter(self.T) returns a VarRef with _name
+        object.__setattr__(self, '_recording', True)
+        try:
+            self.MultipleTestCasesConfig()
+        except NotImplementedError:
+            pass
+        object.__setattr__(self, '_recording', False)
+        _set_multi_config(None)
         return cfg
 
     # ------------------------------------------------------------------
@@ -127,6 +158,9 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
     def OutputFormat(self):
         raise NotImplementedError
 
+    def BeforeOutputFormat(self):
+        raise NotImplementedError
+
     def Constraints(self):
         pass
 
@@ -135,6 +169,9 @@ class BaseProblemSpec(metaclass=ProblemSpecMeta):
 
     def StyleConfig(self):
         pass
+
+    def MultipleTestCasesConfig(self):
+        raise NotImplementedError
 
     # Subtask1..25 — user implements whichever they need
     def Subtask1(self): raise NotImplementedError

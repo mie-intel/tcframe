@@ -9,7 +9,7 @@ strings for sample test cases.
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 
-from tcframe.spec.testcase import TestCase, TestSuite, _set_context, _set_current_sample
+from tcframe.spec.testcase import TestCase, TestSuite, _set_context, _set_current_sample, _set_current_group
 
 if TYPE_CHECKING:
     from tcframe.spec.base_problem import BaseProblemSpec
@@ -61,6 +61,7 @@ class BaseTestSpec:
 
         # --- Official test cases: TestCases() first, then TestGroupN() ---
         try:
+            _set_current_group(0)
             self.TestCases()
         except NotImplementedError:
             for i in range(1, 26):
@@ -68,9 +69,11 @@ class BaseTestSpec:
                 if method is None:
                     break
                 try:
+                    _set_current_group(i)
                     method(self)
                 except NotImplementedError:
                     break
+            _set_current_group(0)
 
         # Assign sequential names to unnamed official test cases
         idx = 1

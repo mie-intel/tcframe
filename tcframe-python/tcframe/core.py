@@ -8,7 +8,7 @@ CLI:
     python spec.py [grade] [--solution ./sol] [--output tc] [--seed N]
                    [--time-limit S] [--no-time-limit]
                    [--memory-limit MB] [--no-memory-limit]
-                   [--brief] [--scorer ./scorer]
+                   [--brief] [--scorer ./scorer] [--communicator ./comm]
 """
 
 from __future__ import annotations
@@ -51,12 +51,14 @@ class _TcFrame:
         io_manipulator = problem._build_io_format()
         constraint_suite, verifier = problem._build_constraint_suite()
         grading_cfg = problem._build_grading_config()
+        style_cfg = problem._build_style_config()
+        multi_cfg = problem._build_multiple_test_cases_config()
 
         test_spec = test_spec_cls()
         test_suite = test_spec._build_test_suite(slug, problem)
 
         # Resolve effective time/memory limits:
-        # CLI flag overrides spec; --no-X disables the limit entirely
+        # CLI flag overrides spec; --no-X disables entirely
         def _resolve_limit(cli_val, no_flag, spec_val):
             if no_flag:
                 return None
@@ -67,6 +69,22 @@ class _TcFrame:
         time_limit = _resolve_limit(args.time_limit, args.no_time_limit, grading_cfg.time_limit)
         memory_limit = _resolve_limit(args.memory_limit, args.no_memory_limit, grading_cfg.memory_limit)
 
+        # Scorer: CLI --scorer overrides StyleConfig CustomScorer(); default './scorer' ignored
+        scorer_command = style_cfg.scorer_command  # from CustomScorer() in spec
+        if args.scorer != './scorer':              # explicit --scorer on CLI wins
+            scorer_command = args.scorer
+
+        # Communicator: only used when InteractiveEvaluator() set or --communicator given
+        communicator_command = None
+        if style_cfg.evaluator == 'interactive':
+            # Use CLI value (default './communicator') when spec says interactive
+            communicator_command = args.communicator
+        if args.communicator != './communicator':
+            # Explicit --communicator on CLI forces interactive mode
+            communicator_command = args.communicator
+
+        has_output = style_cfg.has_output
+
         if args.command == 'generate':
             print(f"Generating test cases for '{slug}'...")
             options = GenerationOptions(
@@ -76,6 +94,8 @@ class _TcFrame:
                 seed=args.seed,
                 time_limit=time_limit,
                 memory_limit=memory_limit,
+                has_output=has_output,
+                multi_tc_config=multi_cfg if multi_cfg.counter_var else None,
             )
             generator = Generator(problem, io_manipulator, verifier, test_suite)
             generator.generate(options)
@@ -90,6 +110,10 @@ class _TcFrame:
                 memory_limit=memory_limit,
                 subtask_points=subtask_points,
                 brief=args.brief,
+                scorer_command=scorer_command,
+                communicator_command=communicator_command,
+                has_output=has_output,
+                multi_tc_config=multi_cfg if multi_cfg.counter_var else None,
             )
             grader = Grader(test_suite)
             grader.grade(options)
