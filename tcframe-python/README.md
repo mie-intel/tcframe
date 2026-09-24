@@ -9,6 +9,7 @@ Python abstraction layer for [tcframe](https://tcframe.toki.id) — a test case 
 Your spec runs entirely in Python (no compilation step), while the solution binary you provide still runs as a native executable.
 
 **Key advantages over writing C++ specs:**
+
 - Native big integers — `10**1000` just works, no overflow concerns
 - Full Python standard library available for test case generation
 - Cross-platform: Windows, Linux, macOS
@@ -71,19 +72,19 @@ This generates `tc/` containing `.in` and `.out` files (`.out` files are produce
 
 ## API overview
 
-| Symbol | Purpose |
-|--------|---------|
-| `BaseProblemSpec` | Base class — declare variables as type annotations, implement `InputFormat`, `OutputFormat`, `Constraints` |
-| `BaseTestSpec` | Base class — implement `SampleTestCaseN`, `TestCases` (or `TestGroupN`) |
-| `LINE(a, b, ...)` | Write space-separated values on one line |
-| `LINES(vec) % SIZE(n)` | Write one value per line |
-| `GRID(mat) % SIZE(r, c)` | Write a 2-D matrix, space-separated rows |
-| `EMPTY_LINE()` | Write a blank line |
-| `CONS(lambda: expr)` | Declare a constraint — checked for each test case |
-| `CASE(A=1, B=2)` | Declare a test case by assigning variable values |
-| `rnd.nextInt(lo, hi)` | Random integer in [lo, hi] (inclusive) |
-| `rnd.nextDouble(lo, hi)` | Random float in [lo, hi] |
-| `tcframe.run(ProblemSpec, TestSpec)` | Entry point — call at the bottom of `spec.py` |
+| Symbol                               | Purpose                                                                                                    |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `BaseProblemSpec`                    | Base class — declare variables as type annotations, implement `InputFormat`, `OutputFormat`, `Constraints` |
+| `BaseTestSpec`                       | Base class — implement `SampleTestCaseN`, `TestCases` (or `TestGroupN`)                                    |
+| `LINE(a, b, ...)`                    | Write space-separated values on one line                                                                   |
+| `LINES(vec) % SIZE(n)`               | Write one value per line                                                                                   |
+| `GRID(mat) % SIZE(r, c)`             | Write a 2-D matrix, space-separated rows                                                                   |
+| `EMPTY_LINE()`                       | Write a blank line                                                                                         |
+| `CONS(lambda: expr)`                 | Declare a constraint — checked for each test case                                                          |
+| `CASE(A=1, B=2)`                     | Declare a test case by assigning variable values                                                           |
+| `rnd.nextInt(lo, hi)`                | Random integer in [lo, hi] (inclusive)                                                                     |
+| `rnd.nextDouble(lo, hi)`             | Random float in [lo, hi]                                                                                   |
+| `tcframe.run(ProblemSpec, TestSpec)` | Entry point — call at the bottom of `spec.py`                                                              |
 
 ## Options
 
@@ -99,4 +100,4 @@ tcframe.run(
 
 ## Full design
 
-See [`DESIGN.md`](../DESIGN.md) at the repo root for the full architecture and design decisions.
+See [`DESIGN.md`](DESIGN.md) at the repo root for the full architecture and design decisions.
