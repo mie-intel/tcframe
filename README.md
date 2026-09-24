@@ -3,8 +3,8 @@
 
   <h1>TCFrame</h1>
 
-A test case generation framework for competitive programming problems.
-
+  A test case generation framework for competitive programming problems.
+ 
   <img alt="CI" src="https://github.com/ia-toki/tcframe/workflows/ci/badge.svg"/>
   <a href="https://github.com/ia-toki/tcframe/blob/master/LICENSE.txt"><img alt="License" src="https://img.shields.io/github/license/ia-toki/tcframe.svg"/></a>
 </div>
