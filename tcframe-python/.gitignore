@@ -1,6 +1,12 @@
 # Generated test cases — never commit these
 **/tc/
 
+# Compiled example binaries — run make to build
+examples/*/solution
+examples/*/solution_ac
+examples/*/solution_tle
+examples/*/solution_mle
+
 # Python artifacts
 __pycache__/
 *.pyc
