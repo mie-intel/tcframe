@@ -28,7 +28,7 @@ Key properties:
 - Writing generated files to `tc/` directory
 - Basic constraint violation reporting
 
-**Out (future):**
+**Out:**
 - Local grading with time/memory limits
 - Subtasks
 - Interactive problems
